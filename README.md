@@ -7,11 +7,11 @@ A cluster of Raspberry Pis is deployed using Ansible and Kubernetes.
 
 ## Why
 
-This is a project I always wanted to do, and that's when I came a corss the project made by [Jeff Geerling](https://github.com/geerlingguy) the guy is a legend, he is very active in the community and has a project called [Raspberry Pi Dramble](https://github.com/geerlingguy/raspberry-pi-dramble).
+This is a project I always wanted to do, and that's when I came a cross the project made by [Jeff Geerling](https://github.com/geerlingguy) the guy is a legend, he is very active in the community and has a project called [Raspberry Pi Dramble](https://github.com/geerlingguy/raspberry-pi-dramble).
 
 Based entirely on this Raspberry Pi Dramble project, I created my Brazilian version [Raspberry Pi Geexar](https://github.com/rafasousa/geexar-raspberry-pi) I forked Jeff's project, removed some things and made it lighter just leaving that you would need for a Kubernetes cluster.
 
-Well that is it if you are interested and want more details do not hesitate to open an Issuer or a Pull Request :slightly_smiling_face:
+Well that is it if you are interested and want more details doesn't hesitate to open an Issuer or a Pull Request 😉
 
 ## Official Project Raspberry Pi Dramble
 
@@ -28,7 +28,7 @@ You can browse more information about _geerlingguy_'s Geexar on [http://www.pidr
 
 ## Getting the Pis (and other accessories)
 
-Many people have asked for a basic list of components used in constructing the Geexar, or where I found particular parts. In the Wiki, I've added pages listing the following:
+A basic list of components used in constructing:
 
   - [Raspberry Pis and Accessories](http://www.pidramble.com/wiki/hardware/pis)
   - [Other Necessities](http://www.pidramble.com/wiki/hardware/necessities)
