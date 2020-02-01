@@ -1,0 +1,37 @@
+---
+- hosts: geexar
+  become: yes
+
+  vars_files:
+    - vars.yml
+
+  tasks:
+    - name: Set the current MAC address for eth0.
+      set_fact:
+        geexar_mac_address: "{{ hostvars[inventory_hostname].ansible_default_ipv4.macaddress }}"
+
+    - name: Set variables based on eth0 MAC address.
+      set_fact:
+        geexar_hostname: "{{ mac_address_mapping[geexar_mac_address].name }}"
+        geexar_ip_address: "{{ mac_address_mapping[geexar_mac_address].ip }}"
+
+    - name: Update /etc/hostname
+      template:
+        src: "templates/hostname.j2"
+        dest: "/etc/hostname"
+        mode: 0644
+
+    - name: Run hostname command
+      command: "hostname {{ geexar_hostname }}"
+
+    - name: Update /etc/dhcpcd.conf
+      template:
+        src: "templates/dhcpcd.conf.j2"
+        dest: "/etc/dhcpcd.conf"
+        mode: 0644
+
+    - name: Update /etc/hosts
+      template:
+        src: "templates/hosts.j2"
+        dest: "/etc/hosts"
+        mode: 0644

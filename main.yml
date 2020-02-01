@@ -1,0 +1,67 @@
+---
+- hosts: geexar
+  become: true
+
+  vars_files:
+    - vars/main.yml
+    - config.yml
+
+  pre_tasks:
+    - import_tasks: tasks/test-setup.yml
+      when: deploy_target != 'pi'
+      tags: ['always']
+
+    - name: Ensure dependencies are installed.
+      apt:
+        name:
+          - sudo
+          - openssh-server
+        state: present
+
+    - import_tasks: tasks/cgroup-features.yml
+    - import_tasks: tasks/disable-swap.yml
+      tags: ['always']
+
+    - import_tasks: tasks/iptables-legacy.yml
+      when:
+        - ansible_distribution_version == "10"
+
+    - name: Set the master node IP.
+      set_fact:
+        kubernetes_master_ip: "{{ hostvars['kube1']['ansible_host'] }}"
+      tags: ['always']
+
+  roles:
+    - role: geerlingguy.security
+      tags: ['security']
+
+    - role: geerlingguy.swap
+      tags: ['always', 'swap']
+      when: deploy_target == 'vagrant'
+
+    - role: geerlingguy.nfs
+      tags: ['nfs']
+      delegate_to: "{{ groups.geexar[0] }}"
+      run_once: true
+
+    - role: geerlingguy.pip
+      tags: ['pip', 'docker']
+
+    - role: geerlingguy.docker_arm
+      tags: ['docker']
+
+    - role: geerlingguy.kubernetes
+      tags: ['kubernetes']
+
+  tasks:
+    - include_tasks: tasks/nfs.yml
+      tags: ['nfs']
+
+    - import_tasks: tasks/k8s-config.yml
+      tags: ['kubernetes']
+
+    - import_role:
+        name: geerlingguy.k8s_manifests
+      tags: ['kubernetes', 'manifests']
+      delegate_to: "{{ groups.geexar[0] }}"
+      run_once: true

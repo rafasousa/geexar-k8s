@@ -1,0 +1,14 @@
+.DS_Store
+*.retry
+
+config.yml
+
+roles/geerlingguy.*
+
+setup/networking/inventory
+setup/networking/vars.yml
+
+*.vmdk
+*.pyc
+*Removing
+*.vagrant

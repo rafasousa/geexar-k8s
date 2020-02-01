@@ -1,0 +1,11 @@
+[geexar]
+kube1 ansible_host=192.168.56.56 kubernetes_role=master
+kube2 ansible_host=192.168.56.57 kubernetes_role=node
+kube3 ansible_host=192.168.56.58 kubernetes_role=node
+
+[geexar:vars]
+ansible_ssh_user=vagrant
+ansible_ssh_private_key_file=~/.vagrant.d/insecure_private_key
+ansible_python_interpreter=auto
+deploy_target=vagrant
+kubernetes_apiserver_advertise_address=192.168.56.56

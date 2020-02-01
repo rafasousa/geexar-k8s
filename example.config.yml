@@ -1,0 +1,14 @@
+---
+
+# Network eg: lan.toarray.com (DNS)
+cluster_domain: k8s.toarray.com
+
+# Default timezone
+timezone: America/Sao_Paulo
+
+# NFS configuration.
+nfs_mount_dir: /mnt/nfs
+nfs_extra_dirs: []
+nfs_extra_volumes: []
+#  - { src: "/dev/asd1",                       dist: "{{ nfs_mount_dir }}/ssd" }
+#  - { src: "10.0.0.200:{{ nfs_share_dir }}",  dist: "{{ nfs_mount_dir }}/tank" }

@@ -1,0 +1,54 @@
+---
+- name: Ensure rpcbind is running and enabled if exports are present.
+  service:
+    name: rpcbind
+    state: started
+    enabled: yes
+  register: rpcbind_enable
+  when: nfs_exports | length
+  delegate_to: "{{ groups.geexar[0] }}"
+  run_once: true
+
+- name: Restart NFS immediately if exports are updated.
+  service:
+    name: "{{ nfs_server_daemon }}"
+    state: restarted
+  when: rpcbind_enable.changed
+  delegate_to: "{{ groups.geexar[0] }}"
+  run_once: true
+
+- name: Ensure NFS share and mount directories exist.
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: www-data
+    mode: 0775
+  with_items:
+    - "{{ nfs_share_dir }}"
+    - "{{ nfs_mount_dir }}"
+  delegate_to: "{{ groups.geexar[0] }}"
+  run_once: true
+
+- name: Flush handlers so NFS mounts are exported.
+  meta: flush_handlers
+
+- name: Ensure the NFS volume is mounted from "external storage".
+  mount:
+    name: "{{ item.name }}"
+    src: "{{ item.src }}"
+    fstype: nfs
+    opts: "noauto,x-systemd.automount,x-systemd.device-timeout=10,timeo=14"
+    state: mounted
+  with_items: "{{ nfs_extra_volumes }}"
+  when: nfs_extra_volumes | length
+  delegate_to: "{{ groups.geexar[0] }}"
+  run_once: true
+
+- name: Ensure extra NFS dirs exist.
+  file:
+    path: "{{ nfs_mount_dir }}/{{ item }}"
+    state: directory
+  with_items: "{{ nfs_extra_dirs }}"
+  delegate_to: "{{ groups.geexar[0] }}"
+  run_once: true

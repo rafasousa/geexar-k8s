@@ -1,0 +1,51 @@
+---
+# Security configuration.
+security_sudoers_passwordless:
+  - pi
+
+# Docker configuration.
+docker_install_compose: false
+docker_users:
+  - pi
+
+# Kubernetes configuration.
+kubernetes_enable_web_ui: false
+kubernetes_allow_pods_on_master: false
+kubernetes_pod_network_cidr: '10.244.0.0/16'
+kubernetes_version: '1.17'
+kubernetes_packages:
+  - { name: kubelet=1.17.2-00, state: present }
+  - { name: kubectl=1.17.2-00, state: present }
+  - { name: kubeadm=1.17.2-00, state: present }
+  - { name: kubernetes-cni,    state: present }
+
+k8s_manage_namespace: false
+k8s_no_log: false
+k8s_manifests_base_dir: k8s-manifests/
+k8s_manifests:
+  # - kube-dashboard/deployment
+  # - kube-dashboard/rbac
+  - kube-system/ingress/deployment
+  - kube-system/ingress/rbac
+
+# Python dependencies.
+pip_install_packages:
+  - openshift
+
+# Swap configuration.
+swap_file_state: absent
+swap_file_path: /dev/mapper/packer--debian--10--amd64--vg-swap_1
+
+# Image to use for the traefik-ingress-controller daemonset.
+traefik_image: traefik:1.7
+
+# Image to use for the dashboard-arm deployment.
+kubernetes_dashboard_image: kubernetesui/dashboard-arm:v2.0.0-rc3
+
+# Image to use for the metrics-server deployment.
+metrics_server_image: kubernetesui/metrics-scraper-arm:v1.0.3
+
+# NFS configuration.
+nfs_share_dir: /srv/nfs
+nfs_exports: { "/srv/nfs *(rw,sync,no_root_squash,no_subtree_check)" }
+# nfs_mount_dir: /mnt/nfs # defined in global vars file.

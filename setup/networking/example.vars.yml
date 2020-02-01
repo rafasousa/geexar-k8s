@@ -1,0 +1,22 @@
+---
+# Mapping of what hardware MAC addresses should be configured with specific IPs.
+mac_address_mapping:
+  "b8:27:eb:69:0d:c3":
+    name: kube1.pigeexar.com
+    ip: "10.0.100.61"
+  "b8:27:eb:21:1b:f3":
+    name: kube2.pigeexar.com
+    ip: "10.0.100.62"
+  "b8:27:eb:e3:be:21":
+    name: kube3.pigeexar.com
+    ip: "10.0.100.63"
+  "b8:27:eb:09:4f:46":
+    name: kube4.pigeexar.com
+    ip: "10.0.100.64"
+
+# Nameservers to use in resolv.conf.
+dns_nameservers:
+  - "1.1.1.1"
+  - "1.0.0.1"
+
+default_gateway: 10.0.0.1
