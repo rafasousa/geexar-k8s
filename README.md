@@ -3,7 +3,7 @@
 A cluster of Raspberry Pis is deployed using Ansible and Kubernetes.
 
 <p align="center">
-<img src="/images/raspberry-pi-geexar-2020.jpg" alt="Raspberry Pi Geexar" /></p>
+<img src="/images/raspberry-pi-geexar-2020.jpg" alt="Raspberry Pi Geexar" width="70%" /></p>
 
 ## Why
 
