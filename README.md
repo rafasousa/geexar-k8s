@@ -15,7 +15,7 @@ Well that is it if you are interested and want more details doesn't hesitate to 
 
 ## Official Project Raspberry Pi Dramble
 
-You can browse more information about _geerlingguy_'s Geexar on [http://www.pidramble.com](http://www.pidramble.com). This site is running on the Raspberry Pi Dramble of Jeff cluster!
+You can browse more information about _geerlingguy_'s Dramble on [http://www.pidramble.com](http://www.pidramble.com). This site is running on the Raspberry Pi Dramble of Jeff cluster!
 
 ## Specs
 
