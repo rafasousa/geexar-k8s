@@ -1,7 +1,7 @@
 ---
 
 # Network eg: lan.toarray.com (DNS)
-cluster_domain: k8s.toarray.com
+cluster_domain: home.toarray.com
 
 # Default timezone
 timezone: America/Sao_Paulo

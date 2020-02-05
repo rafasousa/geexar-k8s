@@ -1,0 +1,26 @@
+# ---
+# # - name: Install Cert Manager.
+# #   command: "{{ item }}"
+# #   with_items:
+# #     - kubectl create namespace cert-manager
+# #     - kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v0.13.0/cert-manager.yaml
+# #   run_once: True
+# #   when: kubernetes_enable_cert_manager == true
+# #   delegate_to: "{{ groups.geexar[0] }}"
+
+- name: Copy config file MetalLB manifest.
+  template:
+    src: k8s-manifests/metal-lb/manifest.yml
+    dest: "/tmp/metallb-config-map.yml"
+  run_once: True
+  delegate_to: "{{ groups.geexar[0] }}"
+  when: kubernetes_enable_load_balancer == true
+
+- name: Install MetalLB LoadBalancer.
+  command: "{{ item }}"
+  with_items:
+    - kubectl apply -f https://raw.githubusercontent.com/google/metallb/v0.8.3/manifests/metallb.yaml
+    - kubectl apply -f /tmp/metallb-config-map.yml
+  run_once: True
+  delegate_to: "{{ groups.geexar[0] }}"
+  when: kubernetes_enable_load_balancer == true

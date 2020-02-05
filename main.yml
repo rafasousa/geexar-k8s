@@ -57,6 +57,9 @@
     - include_tasks: tasks/nfs.yml
       tags: ['nfs']
 
+    - import_tasks: tasks/k8s-services.yml
+      tags: ['kubernetes', 'services']
+
     - import_tasks: tasks/k8s-config.yml
       tags: ['kubernetes']
 

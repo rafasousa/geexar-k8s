@@ -8,6 +8,10 @@ docker_install_compose: false
 docker_users:
   - pi
 
+# Kubernetes enable load balancer.
+kubernetes_enable_load_balancer: true
+kubernetes_load_balancer_range_ip: 10.0.0.230-10.0.0.250
+
 # Kubernetes configuration.
 kubernetes_enable_web_ui: false
 kubernetes_allow_pods_on_master: false
@@ -23,8 +27,6 @@ k8s_manage_namespace: false
 k8s_no_log: false
 k8s_manifests_base_dir: k8s-manifests/
 k8s_manifests:
-  # - kube-dashboard/deployment
-  # - kube-dashboard/rbac
   - kube-system/ingress/deployment
   - kube-system/ingress/rbac
 

@@ -8,6 +8,8 @@ roles/geerlingguy.*
 setup/networking/inventory
 setup/networking/vars.yml
 
+tests/
+
 *.vmdk
 *.pyc
 *Removing
