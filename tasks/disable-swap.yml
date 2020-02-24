@@ -4,7 +4,8 @@
   shell: >
     dphys-swapfile swapoff &&
     dphys-swapfile uninstall &&
-    update-rc.d -f dphys-swapfile remove
+    update-rc.d dphys-swapfile remove &&
+    systemctl disable dphys-swapfile.service
   when:
-    - ansible_swaptotal_mb > 0
+    # - ansible_swaptotal_mb > 0
     - deploy_target == 'pi'

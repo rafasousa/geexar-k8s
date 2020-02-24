@@ -39,7 +39,7 @@ swap_file_state: absent
 swap_file_path: /dev/mapper/packer--debian--10--amd64--vg-swap_1
 
 # Image to use for the traefik-ingress-controller daemonset.
-traefik_image: traefik:1.7
+traefik_image: traefik:v2.1
 
 # Image to use for the dashboard-arm deployment.
 kubernetes_dashboard_image: kubernetesui/dashboard-arm:v2.0.0-rc3
