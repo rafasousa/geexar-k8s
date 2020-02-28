@@ -40,6 +40,7 @@ swap_file_path: /dev/mapper/packer--debian--10--amd64--vg-swap_1
 
 # Image to use for the traefik-ingress-controller daemonset.
 traefik_image: traefik:v2.1
+traefik_load_balancer_ip: 10.0.0.230 # IP from load balancer metallb =)
 
 # Image to use for the dashboard-arm deployment.
 kubernetes_dashboard_image: kubernetesui/dashboard-arm:v2.0.0-rc3
