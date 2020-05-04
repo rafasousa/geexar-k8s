@@ -16,11 +16,11 @@ kubernetes_load_balancer_range_ip: 10.0.0.230-10.0.0.250
 kubernetes_enable_web_ui: false
 kubernetes_allow_pods_on_master: false
 kubernetes_pod_network_cidr: '10.244.0.0/16'
-kubernetes_version: '1.17'
+kubernetes_version: '1.18'
 kubernetes_packages:
-  - { name: kubelet=1.17.2-00, state: present }
-  - { name: kubectl=1.17.2-00, state: present }
-  - { name: kubeadm=1.17.2-00, state: present }
+  - { name: kubelet=1.18.2-00, state: present }
+  - { name: kubectl=1.18.2-00, state: present }
+  - { name: kubeadm=1.18.2-00, state: present }
   - { name: kubernetes-cni,    state: present }
 
 k8s_manage_namespace: false
@@ -39,7 +39,7 @@ swap_file_state: absent
 swap_file_path: /dev/mapper/packer--debian--10--amd64--vg-swap_1
 
 # Image to use for the traefik-ingress-controller daemonset.
-traefik_image: traefik:v2.1
+traefik_image: traefik:v2.2.1
 traefik_load_balancer_ip: 10.0.0.230 # IP from load balancer metallb =)
 
 # Image to use for the dashboard-arm deployment.
