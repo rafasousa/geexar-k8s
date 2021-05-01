@@ -2,7 +2,6 @@
 - name: Override vars for non-ARM test environments.
   set_fact:
     docker_version: 5:19.03.1~3-0~debian-buster
-    kubernetes_dashboard_image: kubernetesui/dashboard-amd64:v2.0.0-rc3
     metrics_server_image: kubernetesui/metrics-scraper-amd64:v1.0.3
     # See: https://askubuntu.com/questions/416741/why-is-nfs-not-allowing-me-to-mount-a-share
     nfs_exports: { "/srv/nfs *(rw,sync,no_root_squash,no_subtree_check,insecure)" }

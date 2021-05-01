@@ -22,9 +22,10 @@
     - import_tasks: tasks/disable-swap.yml
       tags: ['always']
 
-    - import_tasks: tasks/iptables-legacy.yml
+    - import_tasks: tasks/net-setup.yml
       when:
         - ansible_distribution_version == "10"
+        - deploy_target != 'docker'
 
     - name: Set the master node IP.
       set_fact:
@@ -47,8 +48,8 @@
     - role: geerlingguy.pip
       tags: ['pip', 'docker']
 
-    - role: geerlingguy.docker_arm
-      tags: ['docker']
+    - role: geerlingguy.containerd
+      tags: ['containerd']
 
     - role: geerlingguy.kubernetes
       tags: ['kubernetes']
@@ -56,6 +57,9 @@
   tasks:
     - include_tasks: tasks/nfs.yml
       tags: ['nfs']
+
+    - import_tasks: tasks/k8s-registry-setup.yml
+      tags: ['kubernetes']
 
     - import_tasks: tasks/k8s-services.yml
       tags: ['kubernetes', 'services']

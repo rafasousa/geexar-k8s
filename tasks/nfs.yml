@@ -24,21 +24,27 @@
     owner: root
     group: www-data
     mode: 0775
-  with_items:
-    - "{{ nfs_share_dir }}"
-    - "{{ nfs_mount_dir }}"
+  with_items: "{{ nfs_mount_dirs }}"
   delegate_to: "{{ groups.geexar[0] }}"
   run_once: true
+
+- name: Ensure exFAT utilities are installed.
+  apt:
+    name:
+      - exfat-fuse
+      - exfat-utils
+    state: present
+  when: nfs_enable_exfat_file_system == true
 
 - name: Flush handlers so NFS mounts are exported.
   meta: flush_handlers
 
 - name: Ensure the NFS volume is mounted from "external storage".
   mount:
-    name: "{{ item.name }}"
     src: "{{ item.src }}"
-    fstype: nfs
-    opts: "noauto,x-systemd.automount,x-systemd.device-timeout=10,timeo=14"
+    path: "{{ item.path }}"
+    fstype: exfat
+    opts: "defaults,auto,users,rw,nofail 0 0"
     state: mounted
   with_items: "{{ nfs_extra_volumes }}"
   when: nfs_extra_volumes | length
@@ -47,7 +53,7 @@
 
 - name: Ensure extra NFS dirs exist.
   file:
-    path: "{{ nfs_mount_dir }}/{{ item }}"
+    path: "{{ nfs_share_dir }}/{{ item }}"
     state: directory
   with_items: "{{ nfs_extra_dirs }}"
   delegate_to: "{{ groups.geexar[0] }}"

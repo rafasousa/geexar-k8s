@@ -1,31 +1,34 @@
-# ---
-# # - name: Install Cert Manager.
-# #   command: "{{ item }}"
-# #   with_items:
-# #     - kubectl create namespace cert-manager
-# #     - kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v0.13.0/cert-manager.yaml
-# #   run_once: True
-# #   when: kubernetes_enable_cert_manager == true
-# #   delegate_to: "{{ groups.geexar[0] }}"
-
-- name: Copy config file MetalLB manifest.
+---
+- name: Copy Kubernetes definition files to the cluster.
   template:
-    src: k8s-manifests/metal-lb/manifest.yml
-    dest: "/tmp/metallb-config-map.yml"
+    src: "{{ item }}"
+    dest: "~/{{ item | basename }}"
+  with_fileglob: "k8s-manifests/kube-system/*.yml"
+  delegate_to: "{{ groups.geexar[0] }}"
+  run_once: True
+
+- name: Apply metrics-server manifest to the cluster.
+  k8s:
+    state: present
+    src: ~/metrics-server.yml
   run_once: True
   delegate_to: "{{ groups.geexar[0] }}"
-  when: kubernetes_enable_load_balancer == true
 
 - name: Install MetalLB LoadBalancer.
   command: "{{ item }}"
   with_items:
     - kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.9.3/manifests/namespace.yaml
     - kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.9.3/manifests/metallb.yaml
-
     # On first install only
-    - kubectl create secret generic -n metallb-system memberlist --from-literal=secretkey="$(openssl rand -base64 128)"
+    # - kubectl create secret generic -n metallb-system memberlist --from-literal=secretkey="$(openssl rand -base64 128)"
+  run_once: True
+  delegate_to: "{{ groups.geexar[0] }}"
+  when: kubernetes_enable_load_balancer == true
 
-    - kubectl apply -f /tmp/metallb-config-map.yml
+- name: Create MetalLB LoadBalancer config-map.
+  k8s:
+    state: present
+    src: ~/metallb-config-map.yml
   run_once: True
   delegate_to: "{{ groups.geexar[0] }}"
   when: kubernetes_enable_load_balancer == true

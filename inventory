@@ -1,10 +1,10 @@
 [geexar]
-kube1 ansible_host=10.0.0.61 kubernetes_role=master
-kube2 ansible_host=10.0.0.62 kubernetes_role=node
-kube3 ansible_host=10.0.0.63 kubernetes_role=node
-kube4 ansible_host=10.0.0.64 kubernetes_role=node
+kube1 ansible_host=192.168.23.61 kubernetes_role=master
+kube2 ansible_host=192.168.23.62 kubernetes_role=node
+kube3 ansible_host=192.168.23.63 kubernetes_role=node
+kube4 ansible_host=192.168.23.64 kubernetes_role=node
 
 [geexar:vars]
 ansible_ssh_user=pi
 deploy_target=pi
-kubernetes_apiserver_advertise_address=10.0.0.61
+kubernetes_apiserver_advertise_address=192.168.23.61
