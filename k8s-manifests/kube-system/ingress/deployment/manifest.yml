@@ -1,3 +1,6 @@
+# https://community.traefik.io/t/can-i-set-namespace-for-tls-secretname-in-ingressroute/2619
+# https://www.jeffgeerling.com/blog/2019/mounting-kubernetes-secret-single-file-inside-pod
+
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -10,6 +13,36 @@ metadata:
   name: traefik-ingress-controller
   namespace: traefik
 
+---
+apiVersion: v1
+kind: Secret
+type: kubernetes.io/tls
+metadata:
+  name: traefik-certs
+  namespace: "traefik"
+data:
+  tls.crt: "{{ lookup('file', playbook_dir  + '/k8s-manifests/kube-system/certs/tls.crt') | b64encode }}"
+  tls.key: "{{ lookup('file', playbook_dir  + '/k8s-manifests/kube-system/certs/tls.key') | b64encode }}"
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: traefik-dynamic
+  namespace: traefik
+data:
+  dynamic.toml: |
+    # Dynamic configuration
+    [[tls.certificates]]
+      certFile = "/certs/tls.crt"
+      keyFile = "/certs/tls.key"
+      stores = ["default"]
+
+    # [[tls.certificates]]
+    #   # Note that since no store is defined,
+    #   # the certificate below will be stored in the `default` store.
+    #   certFile = "/certs/other-domain.cert"
+    #   keyFile = "/certs/other-domain.key"
 ---
 kind: DaemonSet
 apiVersion: apps/v1
@@ -33,11 +66,13 @@ spec:
           image: "{{ traefik_image }}"
           args:
             - --api.insecure
+            - --serversTransport.insecureSkipVerify=true
             - --accesslog
             - --providers.kubernetescrd
             - --providers.kubernetesingress=true
             - --entrypoints.web.address=:80
             - --entrypoints.websecure.address=:443
+            - "--providers.file.filename=/config/dynamic.toml"
             - --api.dashboard=true
           ports:
             - name: web
@@ -46,6 +81,20 @@ spec:
               containerPort: 443
             - name: admin
               containerPort: 8080
+          volumeMounts:
+            - name: certs
+              mountPath: "/certs"
+              readOnly: true
+            - name: dynamic
+              mountPath: "/config"
+              readOnly: true
+      volumes:
+      - name: certs
+        secret:
+          secretName: traefik-certs
+      - name: dynamic
+        configMap:
+          name: traefik-dynamic
 
 ---
 apiVersion: v1

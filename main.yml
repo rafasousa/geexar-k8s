@@ -18,6 +18,24 @@
           - openssh-server
         state: present
 
+    # To fix to incompatible with images based on Ubuntu
+    # https://github.com/causefx/Organizr/issues/1058
+    # https://docs.linuxserver.io/faq#libseccomp
+    - name: Download libseccomp2_2 file to tmp dir
+      get_url:
+        url: http://ftp.us.debian.org/debian/pool/main/libs/libseccomp/libseccomp2_2.5.2-2_armhf.deb
+        dest: /tmp/libseccomp_armhf.deb
+      register: download
+
+    - name: Install libseccomp2_2
+      command: dpkg -i /tmp/libseccomp_armhf.deb
+      when: download.changed
+
+    # - name: Remove the libseccomp2_2
+    #   file:
+    #     path: /tmp/libseccomp_armhf.deb
+    #     state: absent
+
     - import_tasks: tasks/cgroup-features.yml
     - import_tasks: tasks/disable-swap.yml
       tags: ['always']

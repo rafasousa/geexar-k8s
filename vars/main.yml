@@ -15,17 +15,28 @@ docker_users:
 kubernetes_enable_load_balancer: true
 kubernetes_load_balancer_range_ip: 192.168.23.230-192.168.23.250
 
+#
+# Kubernetes reset
+# kubeadm reset -f
+# rm -rf /etc/cni /etc/kubernetes /var/lib/dockershim /var/lib/etcd /var/lib/kubelet /var/run/kubernetes ~/.kube/*
+#
+# sudo iptables -F && iptables -X \
+# sudo iptables -t nat -F && iptables -t nat -X \
+# sudo iptables -t raw -F && iptables -t raw -X \
+# sudo iptables -t mangle -F && iptables -t mangle -X
+#
+
 # Kubernetes configuration.
 kubernetes_enable_web_ui: false
 kubernetes_allow_pods_on_master: false
 kubernetes_version: '1.19'
 kubernetes_packages:
-  - name: kubelet=1.19.7-00
-    state: present
-  - name: kubectl=1.19.7-00
-    state: present
-  - name: kubeadm=1.19.7-00
-    state: present
+  # - name: kubelet=1.19.7-00
+  #   state: present
+  # - name: kubectl=1.19.7-00
+  #   state: present
+  # - name: kubeadm=1.19.7-00
+  #   state: present
   - name: kubernetes-cni
     state: present
 
@@ -35,6 +46,7 @@ k8s_manifests_base_dir: k8s-manifests/
 k8s_manifests:
   - kube-system/ingress/deployment
   - kube-system/ingress/rbac
+  - kube-system/nfs-volumes
   - dir: docker-registry
     namespace: registry
 
@@ -67,7 +79,7 @@ nfs_mount_dirs:
  - "{{ nfs_share_ssd_dir }}"
 
 nfs_extra_volumes:
-- { src: "/dev/sda2", path: "{{ nfs_share_ssd_dir }}" }
+- { src: "/dev/sda1", path: "{{ nfs_share_ssd_dir }}" }
 #  - { src: "10.0.0.200:{{ nfs_share_dir }}",  dist: "{{ nfs_mount_dir }}/tank" }
 
 nfs_extra_dirs:

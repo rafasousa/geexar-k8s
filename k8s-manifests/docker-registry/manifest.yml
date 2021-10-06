@@ -1,38 +1,44 @@
-# PersistentVolume for all apps on the cluster.
+# PersistentVolumeClaim for all apps.
 ---
 apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: nfs-ssd-apps
-spec:
-  storageClassName: ssd-apps
-  capacity:
-    storage: 32Gi
-  accessModes:
-    - ReadWriteMany
-  nfs:
-    server: "{{ kubernetes_master_ip }}"
-    path: "{{ nfs_share_dir }}/ssd/apps"
-    readOnly: false
-  persistentVolumeReclaimPolicy: Retain
-
-# PersistentVolumeClaim for Docker registry.
----
 kind: PersistentVolumeClaim
-apiVersion: v1
 metadata:
-  name: registry-pvc
+  name: ssd-apps
   namespace: {{ manifest_namespace }}
-  labels:
-    app: docker-registry
-  annotations:
-    volume.beta.kubernetes.io/storage-class: "ssd-apps"
 spec:
   accessModes:
     - ReadWriteMany
+  storageClassName: storage-ssd-apps
   resources:
     requests:
       storage: 1Mi
+
+# PersistentVolumeClaim for all medias.
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ssd-media
+  namespace: {{ manifest_namespace }}
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: storage-ssd-media
+  resources:
+    requests:
+      storage: 1Mi
+
+# Docker registry Secret definition.
+---
+kind: Secret
+apiVersion: v1
+metadata:
+  name: docker-registry
+  namespace: kube-system
+data:
+  .dockerconfigjson: >-
+    eyJhdXRocyI6eyJodHRwczovL3JlZ2lzdHJ5LnRvYXJyYXkuY29tIjp7InVzZXJuYW1lIjoiYWRtaW4iLCJwYXNzd29yZCI6ImFkbWluIiwiYXV0aCI6IllXUnRhVzQ2WVdSdGFXND0ifX19
+type: kubernetes.io/dockerconfigjson
 
 # Docker registry Deployment definition.
 ---
@@ -51,6 +57,7 @@ spec:
       labels:
         app: docker-registry
     spec:
+      nodeName: {{ docker_registry_ingress_host }}
       containers:
         - name: docker-registry
           imagePullPolicy: IfNotPresent
@@ -72,7 +79,7 @@ spec:
       volumes:
         - name: docker-registry-data
           persistentVolumeClaim:
-            claimName: registry-pvc
+            claimName: ssd-apps
 
 # Docker registry Service definition.
 ---
@@ -91,36 +98,21 @@ spec:
     port: 5000
     targetPort: 5000
 
-# TLS Secret for Docker registry Ingress.
----
-apiVersion: v1
-kind: Secret
-type: kubernetes.io/tls
-metadata:
-  name: "{{ manifest_namespace }}-tls-cert"
-  namespace: "{{ manifest_namespace }}"
-data:
-  tls.key: "{{ docker_registry_key | b64encode }}"
-  tls.crt: "{{ docker_registry_crt | b64encode }}"
-
 # Docker registry Ingress definition.
 ---
-apiVersion: extensions/v1beta1
-kind: Ingress
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
 metadata:
-  annotations:
-    kubernetes.io/ingress.class: traefik
   name: docker-registry
   namespace: "{{ manifest_namespace }}"
 spec:
-  rules:
-  - host: "{{ docker_registry_domain }}"
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          serviceName: docker-registry
-          servicePort: http
-  tls:
-    - secretName: "{{ manifest_namespace }}-tls-cert"
+  entryPoints:
+    - web
+    - websecure
+  routes:
+  - match: Host(`{{ docker_registry_domain }}`) && PathPrefix(`/`)
+    kind: Rule
+    services:
+    - name: docker-registry
+      port: 5000
+  tls: {}

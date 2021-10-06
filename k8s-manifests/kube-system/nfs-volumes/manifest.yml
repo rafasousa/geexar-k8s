@@ -1,0 +1,35 @@
+# PersistentVolume for all apps on the cluster in ssd disk.
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nfs-ssd-apps
+spec:
+  storageClassName: storage-ssd-apps
+  capacity:
+    storage: 32Gi
+  accessModes:
+    - ReadWriteMany
+  nfs:
+    server: "{{ kubernetes_master_ip }}"
+    path: "{{ nfs_share_ssd_dir }}/apps"
+    readOnly: false
+  persistentVolumeReclaimPolicy: Retain
+
+# PersistentVolume for all medias on the cluster in ssd disk.
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nfs-ssd-media
+spec:
+  storageClassName: storage-ssd-media
+  capacity:
+    storage: 80Gi
+  accessModes:
+    - ReadWriteMany
+  nfs:
+    server: "{{ kubernetes_master_ip }}"
+    path: "{{ nfs_share_ssd_dir }}/media"
+    readOnly: false
+  persistentVolumeReclaimPolicy: Retain
