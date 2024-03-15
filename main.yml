@@ -9,7 +9,7 @@
   pre_tasks:
     - import_tasks: tasks/test-setup.yml
       when: deploy_target != 'pi'
-      tags: ['always']
+      tags: ["always"]
 
     - name: Ensure dependencies are installed.
       apt:
@@ -18,18 +18,18 @@
           - openssh-server
         state: present
 
-    # To fix to incompatible with images based on Ubuntu
-    # https://github.com/causefx/Organizr/issues/1058
-    # https://docs.linuxserver.io/faq#libseccomp
-    - name: Download libseccomp2_2 file to tmp dir
-      get_url:
-        url: http://ftp.us.debian.org/debian/pool/main/libs/libseccomp/libseccomp2_2.5.2-2_armhf.deb
-        dest: /tmp/libseccomp_armhf.deb
-      register: download
+    # # To fix to incompatible with images based on Ubuntu
+    # # https://github.com/causefx/Organizr/issues/1058
+    # # https://docs.linuxserver.io/faq#libseccomp
+    # - name: Download libseccomp2_2 file to tmp dir
+    #   get_url:
+    #     url: http://ftp.us.debian.org/debian/pool/main/libs/libseccomp/libseccomp2_2.3.3-4_armhf.deb
+    #     dest: /tmp/libseccomp_armhf.deb
+    #   register: download
 
-    - name: Install libseccomp2_2
-      command: dpkg -i /tmp/libseccomp_armhf.deb
-      when: download.changed
+    # - name: Install libseccomp2_2
+    #   command: dpkg -i /tmp/libseccomp_armhf.deb
+    #   when: download.changed
 
     # - name: Remove the libseccomp2_2
     #   file:
@@ -38,55 +38,58 @@
 
     - import_tasks: tasks/cgroup-features.yml
     - import_tasks: tasks/disable-swap.yml
-      tags: ['always']
+      tags: ["always"]
 
     - import_tasks: tasks/net-setup.yml
       when:
-        - ansible_distribution_version == "10"
+        - ansible_distribution_version == "11"
         - deploy_target != 'docker'
 
     - name: Set the master node IP.
       set_fact:
         kubernetes_master_ip: "{{ hostvars['kube1']['ansible_host'] }}"
-      tags: ['always']
+      tags: ["always"]
 
   roles:
     - role: geerlingguy.security
-      tags: ['security']
+      tags: ["security"]
 
     - role: geerlingguy.swap
-      tags: ['always', 'swap']
+      tags: ["always", "swap"]
       when: deploy_target == 'vagrant'
 
     - role: geerlingguy.nfs
-      tags: ['nfs']
+      tags: ["nfs"]
       delegate_to: "{{ groups.geexar[0] }}"
       run_once: true
 
     - role: geerlingguy.pip
-      tags: ['pip', 'docker']
+      tags: ["pip", "docker"]
+
+    # - role: geerlingguy.docker_arm
+    #   tags: ["docker"]
 
     - role: geerlingguy.containerd
-      tags: ['containerd']
+      tags: ["containerd"]
 
     - role: geerlingguy.kubernetes
-      tags: ['kubernetes']
+      tags: ["kubernetes"]
 
   tasks:
     - include_tasks: tasks/nfs.yml
-      tags: ['nfs']
+      tags: ["nfs"]
 
     - import_tasks: tasks/k8s-registry-setup.yml
-      tags: ['kubernetes']
+      tags: ["kubernetes"]
 
     - import_tasks: tasks/k8s-services.yml
-      tags: ['kubernetes', 'services']
+      tags: ["kubernetes", "services"]
 
     - import_tasks: tasks/k8s-config.yml
-      tags: ['kubernetes']
+      tags: ["kubernetes"]
 
     - import_role:
         name: geerlingguy.k8s_manifests
-      tags: ['kubernetes', 'manifests']
+      tags: ["kubernetes", "manifests"]
       delegate_to: "{{ groups.geexar[0] }}"
       run_once: true

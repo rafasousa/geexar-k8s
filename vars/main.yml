@@ -2,6 +2,9 @@
 # Containerd configuration.
 docker_apt_arch: arm64
 
+# Docker configuration.
+# docker_version: 5:23.0.6-1~debian.11~bullseye
+
 # Security configuration.
 security_sudoers_passwordless:
   - pi
@@ -15,30 +18,38 @@ docker_users:
 kubernetes_enable_load_balancer: true
 kubernetes_load_balancer_range_ip: 192.168.23.230-192.168.23.250
 
-#
-# Kubernetes reset
-# kubeadm reset -f
-# rm -rf /etc/cni /etc/kubernetes /var/lib/dockershim /var/lib/etcd /var/lib/kubelet /var/run/kubernetes ~/.kube/*
-#
-# sudo iptables -F && iptables -X \
-# sudo iptables -t nat -F && iptables -t nat -X \
-# sudo iptables -t raw -F && iptables -t raw -X \
-# sudo iptables -t mangle -F && iptables -t mangle -X
-#
+# https://stackoverflow.com/questions/44698283/how-to-completely-uninstall-kubernetes
+# kubeadm reset
+# /*On Debian base Operating systems you can use the following command.*/
+# # on debian base
+# sudo apt-get purge kubeadm kubectl kubelet kubernetes-cni kube*
+
+# # on debian base
+# sudo apt-get autoremove
+
+# /For all/
+# sudo rm -rf ~/.kube
 
 # Kubernetes configuration.
-kubernetes_enable_web_ui: false
-kubernetes_allow_pods_on_master: false
-kubernetes_version: '1.19'
+# kubernetes_enable_web_ui: false
+# kubernetes_toleration_not_ready: 300
+# kubernetes_allow_pods_on_control_plane: false
+
+kubernetes_version: "1.26"
+kubernetes_version_rhel_package: "1.26.1"
+kubernetes_role: control_plane
 kubernetes_packages:
-  # - name: kubelet=1.19.7-00
+  # - name: kubelet=1.26.1-00
   #   state: present
-  # - name: kubectl=1.19.7-00
+  # - name: kubectl=1.26.1-00
   #   state: present
-  # - name: kubeadm=1.19.7-00
+  # - name: kubeadm=1.26.1-00
   #   state: present
   - name: kubernetes-cni
     state: present
+
+# kubernetes_kubelet_extra_args: --container-runtime=remote --container-runtime-endpoint=unix:///var/run/crio/crio.sock --runtime-request-timeout=15m
+# kubernetes_kubeadm_init_extra_opts: --cri-socket /var/run/crio/crio.sock
 
 k8s_manage_namespace: false
 k8s_no_log: false
@@ -58,7 +69,7 @@ pip_install_packages:
 
 # Swap configuration.
 swap_file_state: absent
-swap_file_path: /dev/mapper/packer--debian--10--amd64--vg-swap_1
+swap_file_path: /dev/mapper/packer--debian--11--amd64--vg-swap_1
 
 # Image to use for the traefik-ingress-controller daemonset.
 traefik_image: traefik:v2.2.1
@@ -75,13 +86,13 @@ nfs_exports: { "/srv/nfs *(rw,sync,no_root_squash,no_subtree_check)" }
 nfs_share_ssd_dir: "{{ nfs_share_dir }}/ssd"
 
 nfs_mount_dirs:
- - "{{ nfs_share_dir }}"
- - "{{ nfs_share_ssd_dir }}"
+  - "{{ nfs_share_dir }}"
+  - "{{ nfs_share_ssd_dir }}"
 
 nfs_extra_volumes:
-- { src: "/dev/sda1", path: "{{ nfs_share_ssd_dir }}" }
+  - { src: "/dev/sda1", path: "{{ nfs_share_ssd_dir }}" }
 #  - { src: "10.0.0.200:{{ nfs_share_dir }}",  dist: "{{ nfs_mount_dir }}/tank" }
 
 nfs_extra_dirs:
- - "ssd/apps"
- - "ssd/apps/registry"
+  - "ssd/apps"
+  - "ssd/apps/registry"
